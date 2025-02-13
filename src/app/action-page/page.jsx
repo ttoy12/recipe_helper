@@ -1,14 +1,11 @@
 "use client"
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function UploadPage() {
   const router = useRouter();
   const [selectedOption, setSelectedOption] = useState(null); // null, "upload", or "camera"
   const [uploadedImage, setUploadedImage] = useState(null); // Store uploaded image
-  const [capturedImage, setCapturedImage] = useState(null); // Store captured image
-  const videoRef = useRef(null); // Reference for the video element
-  const canvasRef = useRef(null); // Reference for the canvas element
 
   const handleGoBack = () => {
     router.push("/"); // Navigate back to the home page
@@ -18,16 +15,9 @@ export default function UploadPage() {
     setSelectedOption("upload");
   };
 
-  const handleTakePhoto = () => {
-    setSelectedOption("camera");
-    startCamera();
-  };
-
   const handleCancel = () => {
     setSelectedOption(null); // Reset to the initial state
     setUploadedImage(null); // Clear uploaded image
-    setCapturedImage(null); // Clear captured image
-    stopCamera(); // Stop the camera stream
   };
 
   const handleFileChange = (event) => {
@@ -38,45 +28,6 @@ export default function UploadPage() {
         setUploadedImage(e.target.result); // Set the uploaded image URL
       };
       reader.readAsDataURL(file);
-    }
-  };
-
-  const startCamera = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
-    } catch (error) {
-      console.error("Error accessing camera:", error);
-    }
-  };
-
-  const stopCamera = () => {
-    if (videoRef.current && videoRef.current.srcObject) {
-      const stream = videoRef.current.srcObject;
-      const tracks = stream.getTracks();
-      tracks.forEach((track) => track.stop()); // Stop all tracks
-      videoRef.current.srcObject = null;
-    }
-  };
-
-  const capturePhoto = () => {
-    if (videoRef.current && canvasRef.current) {
-      const video = videoRef.current;
-      const canvas = canvasRef.current;
-      const context = canvas.getContext("2d");
-
-      // Set canvas dimensions to match video feed
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-
-      // Draw the current video frame on the canvas
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-      // Convert canvas image to a data URL and set it as the captured image
-      const imageUrl = canvas.toDataURL("image/png");
-      setCapturedImage(imageUrl);
     }
   };
 
@@ -96,10 +47,10 @@ export default function UploadPage() {
           <div className="space-y-8">
             <div className="bg-white p-8 rounded-lg shadow-lg">
               <h2 className="text-2xl font-bold text-green-700 mb-4">
-                Upload or Take a Photo
+                Upload a Photo
               </h2>
               <p className="text-gray-600 mb-6">
-                Choose how you'd like to provide your ingredients:
+                Upload a photo of your ingredients:
               </p>
               <div className="flex flex-col md:flex-row gap-4">
                 <button
@@ -107,12 +58,6 @@ export default function UploadPage() {
                   className="bg-green-600 text-white px-8 py-3 rounded-lg shadow-lg hover:bg-green-700 transition duration-300 flex-1"
                 >
                   Upload a Photo
-                </button>
-                <button
-                  onClick={handleTakePhoto}
-                  className="bg-green-600 text-white px-8 py-3 rounded-lg shadow-lg hover:bg-green-700 transition duration-300 flex-1"
-                >
-                  Take a Photo
                 </button>
               </div>
             </div>
@@ -133,9 +78,6 @@ export default function UploadPage() {
             />
             {uploadedImage && (
               <div className="mt-4">
-                <h3 className="text-xl font-bold text-green-700 mb-2">
-                  Uploaded Photo
-                </h3>
                 <img
                   src={uploadedImage}
                   alt="Uploaded"
@@ -146,41 +88,6 @@ export default function UploadPage() {
             <button
               onClick={handleCancel}
               className="bg-gray-500 text-white px-8 py-3 rounded-lg shadow-lg hover:bg-gray-600 transition duration-300 mt-4"
-            >
-              Cancel
-            </button>
-          </div>
-        )}
-
-        {/* Take Photo UI */}
-        {selectedOption === "camera" && (
-          <div className="bg-white p-8 rounded-lg shadow-lg">
-            <h2 className="text-2xl font-bold text-green-700 mb-4">
-              Take a Photo
-            </h2>
-            <div className="bg-gray-200 h-64 flex items-center justify-center mb-4">
-              {capturedImage ? (
-                <img
-                  src={capturedImage}
-                  alt="Captured"
-                  className="w-full h-full object-cover rounded-lg"
-                />
-              ) : (
-                <video ref={videoRef} autoPlay className="w-full h-full object-cover" />
-              )}
-            </div>
-            <canvas ref={canvasRef} className="hidden" />
-            {!capturedImage && (
-              <button
-                onClick={capturePhoto}
-                className="bg-green-600 text-white px-8 py-3 rounded-lg shadow-lg hover:bg-green-700 transition duration-300"
-              >
-                Capture Photo
-              </button>
-            )}
-            <button
-              onClick={handleCancel}
-              className="bg-gray-500 text-white px-8 py-3 rounded-lg shadow-lg hover:bg-gray-600 transition duration-300 ml-4"
             >
               Cancel
             </button>

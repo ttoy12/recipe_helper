@@ -28,7 +28,7 @@
     ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx"
-, "src/app/contact/page.jsx", "src/app/action-page/page.jsx"  ],
+, "src/app/contact/page.jsx", "src/app/upload/page.jsx"  ],
   "exclude": [
     "node_modules"
   ]

@@ -5,7 +5,7 @@ export default function Home() {
   const router = useRouter();
 
   const handleGetStarted = () => {
-    router.push("/action-page");
+    router.push("/upload");
   };
 
   return (
